@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public interface WasteRepository extends CrudRepository<WasteEntity, UUID> {
 
-    @Query("from WasteEntity w where w.materialCodesEntity.code = :codeNum")
-    List<WasteEntity> findWasteByCode(String codeNum);
+    @Query("from WasteEntity w where w.codeNum = :codeNum")
+    WasteEntity findWasteByCode(String codeNum);
 
 //    @Query("from WasteEntity w where w.codeName = :codeName")
 //    List<WasteEntity> findWasteByCodeName(@Param("codeName") String codeName);

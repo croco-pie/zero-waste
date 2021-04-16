@@ -16,9 +16,7 @@ public class WasteEntity {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "code_num")
-    private MaterialCodesEntity materialCodesEntity;
+    private String codeNum;
 
     private String codeName;
 }

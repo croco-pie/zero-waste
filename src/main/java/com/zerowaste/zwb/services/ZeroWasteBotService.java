@@ -2,11 +2,13 @@ package com.zerowaste.zwb.services;
 
 import com.zerowaste.zwb.dto.WasteDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @EnableAutoConfiguration
@@ -15,9 +17,7 @@ public class ZeroWasteBotService {
     private final WasteService wasteService;
 
     public void printWaste() {
-        List<WasteDTO> wasteList = wasteService.findWasteByCode("81");
-        System.out.println("\n");
-        System.out.println("Маркировка:");
-        System.out.println(wasteList.get(0).getCode());
+        WasteDTO waste = wasteService.findWasteByCode("81");
+        log.info("Маркировка: {}", waste);
     }
 }

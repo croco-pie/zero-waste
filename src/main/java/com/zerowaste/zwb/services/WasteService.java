@@ -19,12 +19,9 @@ public class WasteService {
     //    private final MaterialCodesRepository materialCodesRepository;
     private final WasteRepository wasteRepository;
 
-    public List<WasteDTO> findWasteByCode(String code) {
+    public WasteDTO findWasteByCode(String code) {
         try {
-            return wasteRepository.findWasteByCode(code)
-                    .stream()
-                    .map(EntityConverter::convertEntityToDTO)
-                    .collect(toList());
+            return EntityConverter.convertEntityToDTO(wasteRepository.findWasteByCode(code));
         } catch (Exception e) {
             log.error("Something went wrong: {}", e.getMessage());
             return null;
