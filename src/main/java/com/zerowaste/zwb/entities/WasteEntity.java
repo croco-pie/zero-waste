@@ -19,4 +19,8 @@ public class WasteEntity {
     private String codeNum;
 
     private String codeName;
+
+    private UUID codeId;
+
+    private String codeDescription;
 }

@@ -10,8 +10,10 @@ public class EntityConverter {
     public static WasteDTO convertEntityToDTO(WasteEntity wasteEntity) {
         return WasteDTO.builder()
                 .id(wasteEntity.getId())
-                .code(wasteEntity.getCodeNum())
-                .name(wasteEntity.getCodeName())
+                .codeNum(wasteEntity.getCodeNum())
+                .codeName(wasteEntity.getCodeName())
+                .codeId(wasteEntity.getCodeId())
+                .codeDescription(wasteEntity.getCodeDescription())
                 .build();
     }
 }

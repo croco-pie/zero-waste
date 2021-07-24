@@ -7,38 +7,30 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class WasteService {
 
-    //    private final MaterialCodesRepository materialCodesRepository;
     private final WasteRepository wasteRepository;
 
+    // todo переделать в List
     public WasteDTO findWasteByCode(String code) {
         try {
             return EntityConverter.convertEntityToDTO(wasteRepository.findWasteByCode(code));
         } catch (Exception e) {
-            log.error("Something went wrong: {}", e.getMessage());
+            log.error("Unable to find waste by code num: {}", e.getMessage());
             return null;
         }
     }
 
-
-//    public List<MaterialCodesDTO> findWasteByCode(String code) {
-//        try {
-//            List<MaterialCodesDTO> wasteDTOList = materialCodesRepository.findMaterialCode(code)
-//                    .stream()
-//                    .map(EntityConverter::convertEntityToDTO)
-//                    .collect(toList());
-//            return wasteDTOList;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
+    // todo переделать в List
+    public WasteDTO findWasteByCodeName(String codeName) {
+        try {
+            return EntityConverter.convertEntityToDTO(wasteRepository.findWasteByCodeName(codeName));
+        } catch (Exception e) {
+            log.error("Unable to find waste by code name {}: {}", codeName, e.getMessage());
+            return null;
+        }
+    }
 }

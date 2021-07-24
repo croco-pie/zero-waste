@@ -10,7 +10,9 @@ import java.util.UUID;
 public class WasteDTO {
 
     private UUID id;
-    private String code;
-    private String name;
+    private String codeNum;
+    private String codeName;
+    private UUID codeId;
+    private String codeDescription;
 
 }
