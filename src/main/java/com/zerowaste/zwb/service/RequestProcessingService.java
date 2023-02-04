@@ -40,8 +40,9 @@ public class RequestProcessingService {
 
     private boolean isInt(String code) {
         try {
+            Integer.parseInt(code);
             log.info("Is int");
-            return Integer.class.isInstance(Integer.parseInt(code));
+            return true;
         } catch (Exception e) {
             log.info("Is string");
             return false;

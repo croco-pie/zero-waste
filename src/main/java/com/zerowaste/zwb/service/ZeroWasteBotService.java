@@ -2,6 +2,7 @@ package com.zerowaste.zwb.service;
 
 import com.zerowaste.zwb.config.BotConfig;
 import com.zerowaste.zwb.dto.WasteDTO;
+import com.zerowaste.zwb.enums.InitMessageEnum;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
     @Autowired
     RequestProcessingService requestProcessingService;
 
+    @Autowired
+    InlineKeyboardService inlineKeyboardService;
+
     public ZeroWasteBotService(BotConfig botConfig) {
         this.botConfig = botConfig;
     }
@@ -38,37 +42,49 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
         return botConfig.getBotToken();
     }
 
-    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        String chatId;
-        String responseMessage;
-        WasteDTO waste;
         SendMessage.SendMessageBuilder builder = SendMessage.builder();
-
         Message message = update.getMessage();
 
         if (message != null) {
-            chatId = message.getChatId().toString();
+            String chatId = message.getChatId().toString();
             builder.chatId(chatId);
-            if (message.getText().equals("/start")) {
-                builder.text("Привет! \n" +
-                        "Это учебный бот, который помогает определить маркировку отходов. \n\n" +
-                        "Введите код или название маркировки, например, 7 или ALU.");
+
+            if (InitMessageEnum.START.name().equals(message.getText())) {
+                setReplyWithGreeting(builder);
+            } else if (InitMessageEnum.SEARCH.name().equals(message.getText())) {
+                setReplyWithButtons(chatId);
             } else {
-                waste = requestProcessingService.processRequest(message);
-                if (waste == null) {
-                    responseMessage = "Вы ввели невалидный код, либо мы пока не знаем эту маркировку :(";
-                } else {
-                    responseMessage = waste.getCodeDescription();
-                    log.info("Found waste by code {}, id {}", waste.getCodeNum(), waste.getId());
-                }
-                builder.text(responseMessage);
+                setReplyWithWasteCodeInfo(message, builder);
             }
             replyWith(builder);
-        } else {
-            log.error("Not a text message.");
         }
+
+    }
+
+    private void setReplyWithGreeting(SendMessage.SendMessageBuilder builder) {
+        builder.text("Привет! \n" +
+                "Это учебный бот, который помогает определить маркировку отходов. \n\n" +
+                "Для открытия меню поиска нажмите /search. \n\n" +
+                "Для быстрого поиска введите код или название маркировки, например, 7 или ALU.");
+    }
+
+    @SneakyThrows
+    private void setReplyWithButtons(String chatId) {
+        execute(inlineKeyboardService.sendInlineKeyBoardMessage(chatId));
+    }
+
+    private void setReplyWithWasteCodeInfo(Message message, SendMessage.SendMessageBuilder builder) {
+        WasteDTO waste = requestProcessingService.processRequest(message);
+        String responseMessage;
+        if (waste == null) {
+            responseMessage = "Вы ввели невалидный код, либо мы пока не знаем эту маркировку :(";
+        } else {
+            responseMessage = waste.getCodeDescription();
+            log.info("Found waste by code {}, id {}", waste.getCodeNum(), waste.getId());
+        }
+        builder.text(responseMessage);
     }
 
     private void replyWith(SendMessage.SendMessageBuilder builder) {
