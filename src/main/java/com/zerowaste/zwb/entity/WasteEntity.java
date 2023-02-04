@@ -23,4 +23,6 @@ public class WasteEntity {
     private UUID codeId;
 
     private String codeDescription;
+
+    private boolean isShown;
 }

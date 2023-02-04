@@ -1,11 +1,14 @@
 package com.zerowaste.zwb.enums;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public enum InitMessageEnum {
 
-    @JsonProperty("/start")
-    START,
-    @JsonProperty("/search")
-    SEARCH
+    START("/start"),
+    SEARCH("/search"),
+    SHOW("/show");
+
+    public final String message;
+
+    InitMessageEnum(String message) {
+        this.message = message;
+    }
 }

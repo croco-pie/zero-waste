@@ -1,8 +1,8 @@
 package com.zerowaste.zwb.service;
 
-import lombok.AllArgsConstructor;
+import com.zerowaste.zwb.enums.MenuButtonEnum;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -15,43 +15,37 @@ import java.util.List;
 @Slf4j
 @Service
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class InlineKeyboardService {
 
-    private InlineKeyboardButton button1;
-    private InlineKeyboardButton button2;
+    private static final String MENU_TEXT = "Выберите действие:";
 
-    static final String TEXT_1 = "Text1";
-    static final String TEXT_2 = "Text2";
-
-    public SendMessage sendInlineKeyBoardMessage (String chatId) {
-
+    public SendMessage buildInlineKeyboardMenu(String chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> keyboardButtons = new ArrayList<>();
         List<List<InlineKeyboardButton>> keyboardRow = new ArrayList<>();
 
-        button1 = setButtonData(TEXT_1, "You pressed " + TEXT_1);
-        button2 = setButtonData(TEXT_2, "You pressed " + TEXT_2);
+        InlineKeyboardButton searchByMarkupButton = setButtonData(MenuButtonEnum.SEARCH_BY_MARKUP.getMessage());
+        InlineKeyboardButton showMarkupsButton = setButtonData(MenuButtonEnum.SHOW_MARKUPS.getMessage());
 
-        keyboardButtons.add(button1);
-        keyboardButtons.add(button2);
+        keyboardButtons.add(searchByMarkupButton);
+        keyboardButtons.add(showMarkupsButton);
         keyboardRow.add(keyboardButtons);
 
         inlineKeyboardMarkup.setKeyboard(keyboardRow);
 
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText("Example");
+        message.setText(MENU_TEXT);
         message.setReplyMarkup(inlineKeyboardMarkup);
 
         return message;
     }
 
-    private InlineKeyboardButton setButtonData(String text, String callBackData) {
+    private InlineKeyboardButton setButtonData(String text) {
         return InlineKeyboardButton.builder()
                 .text(text)
-                .callbackData(callBackData)
+                .callbackData(text)
                 .build();
     }
 }
