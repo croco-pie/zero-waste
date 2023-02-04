@@ -28,6 +28,13 @@ public class MarkupCodeProcessingService {
         }
     }
 
+    public List<String> findAllCodeNames() {
+        return wasteRepository.findAllByIsShown(true).stream()
+                .map(WasteEntity::getCodeName)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     private List<WasteDTO> findAllByWasteCodeOrMarkup(Message message) {
         if (message.hasText()) {
             String code = message.getText().toLowerCase();

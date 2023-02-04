@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -54,7 +55,7 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
             } else if (InitMessageEnum.SEARCH.message.equals(messageText)) {
                 setReplyWithButtons(chatId);
             } else if (InitMessageEnum.SHOW.message.equals(messageText)) {
-                // todo
+                setReplyWithShowWasteCodeButtons(chatId);
             } else {
                 replyMessage = setReplyWithWasteCodeInfo(updateMessage);
             }
@@ -79,6 +80,12 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
     @SneakyThrows
     private void setReplyWithButtons(String chatId) {
         execute(inlineKeyboardService.buildInlineKeyboardMenu(chatId));
+    }
+
+    @SneakyThrows
+    private void setReplyWithShowWasteCodeButtons(String chatId) {
+        List<String> codeNames = markupCodeProcessingService.findAllCodeNames();
+        execute(inlineKeyboardService.buildInlineKeyboardWasteCodes(chatId, codeNames));
     }
 
     private String setReplyForMenuAction(CallbackQuery callbackQuery) {

@@ -18,8 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InlineKeyboardService {
 
-    private static final String MENU_TEXT = "Выберите действие:";
-
     public SendMessage buildInlineKeyboardMenu(String chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> keyboardButtons = new ArrayList<>();
@@ -42,10 +40,32 @@ public class InlineKeyboardService {
         return message;
     }
 
+    public SendMessage buildInlineKeyboardWasteCodes(String chatId, List<String> codeNames) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<InlineKeyboardButton> keyboardButtons = new ArrayList<>();
+        List<List<InlineKeyboardButton>> keyboardRow = new ArrayList<>();
+
+        codeNames.forEach(name -> keyboardButtons.add(setButtonData(name)));
+
+        keyboardRow.add(keyboardButtons);
+
+        inlineKeyboardMarkup.setKeyboard(keyboardRow);
+
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(ALL_ELEMENTS_TEXT);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+
+        return message;
+    }
+
     private InlineKeyboardButton setButtonData(String text) {
         return InlineKeyboardButton.builder()
                 .text(text)
                 .callbackData(text)
                 .build();
     }
+
+    private static final String MENU_TEXT = "Выберите действие:";
+    private static final String ALL_ELEMENTS_TEXT = "Список маркировок:";
 }
