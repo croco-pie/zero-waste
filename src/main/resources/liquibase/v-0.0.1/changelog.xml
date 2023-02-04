@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="100" author="crocopie">
+    <changeSet id="add_table_waste" author="crocopie">
         <createTable schemaName="zero_waste" tableName="waste">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" primaryKeyName="waste_id_pk"/>
@@ -20,6 +20,7 @@
             <column name="code_description" type="varchar">
                 <constraints  nullable="false"/>
             </column>
+            <column name="is_shown" type="boolean" defaultValue="true"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
