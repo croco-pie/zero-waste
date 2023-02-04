@@ -1,8 +1,8 @@
-package com.zerowaste.zwb.services;
+package com.zerowaste.zwb.service;
 
 import com.zerowaste.zwb.dto.WasteDTO;
-import com.zerowaste.zwb.repositories.WasteRepository;
-import com.zerowaste.zwb.utils.EntityConverter;
+import com.zerowaste.zwb.repository.WasteRepository;
+import com.zerowaste.zwb.util.EntityConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

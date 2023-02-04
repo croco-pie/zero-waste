@@ -1,6 +1,6 @@
 package com.zerowaste.zwb.config;
 
-import com.zerowaste.zwb.services.ZeroWasteBotService;
+import com.zerowaste.zwb.service.ZeroWasteBotService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;

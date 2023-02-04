@@ -1,10 +1,8 @@
-package com.zerowaste.zwb.utils;
+package com.zerowaste.zwb.util;
 
 import com.zerowaste.zwb.dto.WasteDTO;
-import com.zerowaste.zwb.entities.WasteEntity;
-import lombok.RequiredArgsConstructor;
+import com.zerowaste.zwb.entity.WasteEntity;
 
-@RequiredArgsConstructor
 public class EntityConverter {
 
     public static WasteDTO convertEntityToDTO(WasteEntity wasteEntity) {

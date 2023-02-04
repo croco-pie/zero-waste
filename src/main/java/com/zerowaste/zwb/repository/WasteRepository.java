@@ -1,6 +1,6 @@
-package com.zerowaste.zwb.repositories;
+package com.zerowaste.zwb.repository;
 
-import com.zerowaste.zwb.entities.WasteEntity;
+import com.zerowaste.zwb.entity.WasteEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

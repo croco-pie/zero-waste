@@ -14,7 +14,5 @@ public class ZeroWasteBotApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(ZeroWasteBotApplication.class).run(args);
-        System.out.println(args);
-        System.out.println("123-------123");
     }
 }

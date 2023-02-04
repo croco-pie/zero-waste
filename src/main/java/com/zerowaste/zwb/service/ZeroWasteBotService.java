@@ -1,4 +1,4 @@
-package com.zerowaste.zwb.services;
+package com.zerowaste.zwb.service;
 
 import com.zerowaste.zwb.config.BotConfig;
 import com.zerowaste.zwb.dto.WasteDTO;

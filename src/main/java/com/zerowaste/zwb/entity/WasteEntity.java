@@ -1,4 +1,4 @@
-package com.zerowaste.zwb.entities;
+package com.zerowaste.zwb.entity;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
