@@ -74,7 +74,6 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
 
     private String setReplyWithWasteCodeInfo(Message message) {
         return markupCodeProcessingService.findByWasteCodeOrMarkup(message);
-
     }
 
     @SneakyThrows

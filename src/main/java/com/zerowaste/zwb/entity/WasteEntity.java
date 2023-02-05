@@ -1,5 +1,6 @@
 package com.zerowaste.zwb.entity;
 
+import com.zerowaste.zwb.enums.WasteTypeEnum;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -20,9 +21,10 @@ public class WasteEntity {
 
     private String codeName;
 
-    private UUID codeId;
-
     private String codeDescription;
+
+    @Enumerated(EnumType.STRING)
+    private WasteTypeEnum wasteType;
 
     private boolean isShown;
 }

@@ -10,7 +10,6 @@ public class EntityConverter {
                 .id(wasteEntity.getId())
                 .codeNum(wasteEntity.getCodeNum())
                 .codeName(wasteEntity.getCodeName())
-                .codeId(wasteEntity.getCodeId())
                 .codeDescription(wasteEntity.getCodeDescription())
                 .build();
     }
