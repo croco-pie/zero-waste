@@ -41,5 +41,5 @@ logging:
     liquibase: INFO
 
 bot:
-  name: bot
-  token: token
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}
