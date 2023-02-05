@@ -32,31 +32,16 @@ public class InlineKeyboardService {
 
         inlineKeyboardMarkup.setKeyboard(keyboardRow);
 
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(MENU_TEXT);
-        message.setReplyMarkup(inlineKeyboardMarkup);
-
-        return message;
+        return buildMessage(chatId, MENU_TEXT, inlineKeyboardMarkup);
     }
 
     public SendMessage buildInlineKeyboardWasteCodes(String chatId, List<String> codeNames) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<InlineKeyboardButton> keyboardButtons = new ArrayList<>();
-        List<List<InlineKeyboardButton>> keyboardRow = new ArrayList<>();
-
-        codeNames.forEach(name -> keyboardButtons.add(setButtonData(name)));
-
-        keyboardRow.add(keyboardButtons);
+        List<List<InlineKeyboardButton>> keyboardRow = buildKeyBoardRows(codeNames);
 
         inlineKeyboardMarkup.setKeyboard(keyboardRow);
 
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(ALL_ELEMENTS_TEXT);
-        message.setReplyMarkup(inlineKeyboardMarkup);
-
-        return message;
+        return buildMessage(chatId, ALL_ELEMENTS_TEXT, inlineKeyboardMarkup);
     }
 
     private InlineKeyboardButton setButtonData(String text) {
@@ -66,6 +51,54 @@ public class InlineKeyboardService {
                 .build();
     }
 
+    private SendMessage buildMessage(String chatId, String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(text);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+
+        return message;
+    }
+
+    private List<List<InlineKeyboardButton>> buildKeyBoardRows(List<String> codeNames) {
+        List<List<InlineKeyboardButton>> keyboardRow = new ArrayList<>();
+
+        addRows(keyboardRow, codeNames.size());
+        addButtonsToRow(keyboardRow, codeNames);
+
+        return keyboardRow;
+    }
+
+    private void addRows(List<List<InlineKeyboardButton>> keyboardRow, int listSize) {
+        int rowCount = getRowCount(listSize);
+
+        for (int i = 0; i < rowCount; i++) {
+            keyboardRow.add(new ArrayList<>(MAX_ELEMENTS_IN_ROW_COUNT));
+        }
+    }
+
+    private int getRowCount(int listSize) {
+        int rowCount = listSize / MAX_ELEMENTS_IN_ROW_COUNT;
+        int extraRowCount = listSize % MAX_ELEMENTS_IN_ROW_COUNT;
+        if (extraRowCount != 0) {
+            rowCount++;
+        }
+
+        return rowCount;
+    }
+
+    private void addButtonsToRow(List<List<InlineKeyboardButton>> keyboardRow, List<String> codeNames) {
+        int rowIndex = 0;
+        for (String codeName : codeNames) {
+            if (keyboardRow.get(rowIndex).size() < MAX_ELEMENTS_IN_ROW_COUNT) {
+                keyboardRow.get(rowIndex).add(setButtonData(codeName));
+            } else {
+                keyboardRow.get(++rowIndex).add(setButtonData(codeName));
+            }
+        }
+    }
+
     private static final String MENU_TEXT = "Выберите действие:";
     private static final String ALL_ELEMENTS_TEXT = "Список маркировок:";
+    private static final int MAX_ELEMENTS_IN_ROW_COUNT = 3;
 }
