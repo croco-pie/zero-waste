@@ -31,4 +31,13 @@ public enum WasteTypeEnum {
     public int getWasteEndCode() {
         return wasteEndCode;
     }
+
+    public static WasteTypeEnum valueOfWasteType(String value) {
+        for (WasteTypeEnum wasteTypeEnum : values()) {
+            if (wasteTypeEnum.wasteTypeName.equals(value)) {
+                return wasteTypeEnum;
+            }
+        }
+        return null;
+    }
 }

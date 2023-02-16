@@ -2,7 +2,7 @@ package com.zerowaste.zwb.service;
 
 import com.zerowaste.zwb.config.BotConfig;
 import com.zerowaste.zwb.enums.InitMessageEnum;
-import com.zerowaste.zwb.enums.MenuButtonEnum;
+import com.zerowaste.zwb.enums.WasteTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +16,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,13 +56,13 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
             } else if (InitMessageEnum.SEARCH.message.equals(messageText)) {
                 setReplyWithButtons(chatId);
             } else if (InitMessageEnum.SHOW.message.equals(messageText)) {
-                setReplyWithShowWasteCodeButtons(chatId);
+                setReplyWithShowWasteCodeTypeButtons(chatId);
             } else {
                 replyMessage = setReplyWithWasteCodeInfo(updateMessage);
             }
         } else {
             if (update.hasCallbackQuery()) {
-                replyMessage = setReplyForMenuAction(update.getCallbackQuery());
+                setReplyForButtonAction(update.getCallbackQuery());
             } else {
                 replyMessage = ERROR_MESSAGE;
             }
@@ -82,23 +83,21 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
     }
 
     @SneakyThrows
-    private void setReplyWithShowWasteCodeButtons(String chatId) {
-        List<String> codeNames = markupCodeProcessingService.findAllCodeNames();
+    private void setReplyWithShowWasteCodeTypeButtons(String chatId) {
+        List<String> wasteTypeNames = Arrays.stream(WasteTypeEnum.values())
+                .map(WasteTypeEnum::getWasteTypeName)
+                .collect(Collectors.toList());
+        execute(inlineKeyboardService.buildInlineKeyboardWasteCodes(chatId, wasteTypeNames));
+    }
+
+    @SneakyThrows
+    private void setReplyWithShowWasteCodeByTypeButtons(String chatId, WasteTypeEnum type) {
+        List<String> codeNames = markupCodeProcessingService.findAllCodeNamesByType(type);
         execute(inlineKeyboardService.buildInlineKeyboardWasteCodes(chatId, codeNames));
     }
 
-    private String setReplyForMenuAction(CallbackQuery callbackQuery) {
-        String replyData = callbackQuery.getData();
-        MenuButtonEnum replyDataEnum = Objects.requireNonNull(MenuButtonEnum.valueOfMessage(replyData));
-        switch (replyDataEnum) {
-            case SEARCH_BY_MARKUP:
-                // todo
-            case SHOW_MARKUPS:
-                // todo
-            default:
-                // todo
-        }
-        return null;
+    private void setReplyForButtonAction(CallbackQuery callbackQuery) {
+        inlineKeyboardService.setReplyForButtonAction(callbackQuery);
     }
 
     private void replyWith(String response, SendMessage.SendMessageBuilder builder) {

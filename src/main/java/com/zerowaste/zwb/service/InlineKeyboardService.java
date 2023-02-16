@@ -1,16 +1,20 @@
 package com.zerowaste.zwb.service;
 
+import com.zerowaste.zwb.enums.ButtonActionTypeEnum;
 import com.zerowaste.zwb.enums.MenuButtonEnum;
+import com.zerowaste.zwb.enums.WasteTypeEnum;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -32,16 +36,31 @@ public class InlineKeyboardService {
 
         inlineKeyboardMarkup.setKeyboard(keyboardRow);
 
-        return buildMessage(chatId, MENU_TEXT, inlineKeyboardMarkup);
+        return buildMessage(chatId, ButtonActionTypeEnum.CHOOSE_ACTION.actionTypeMessage, inlineKeyboardMarkup);
     }
 
-    public SendMessage buildInlineKeyboardWasteCodes(String chatId, List<String> codeNames) {
+    public SendMessage buildInlineKeyboardWasteCodes(String chatId, List<String> names) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboardRow = buildKeyBoardRows(codeNames);
+        List<List<InlineKeyboardButton>> keyboardRow = buildKeyBoardRows(names);
 
         inlineKeyboardMarkup.setKeyboard(keyboardRow);
 
-        return buildMessage(chatId, ALL_ELEMENTS_TEXT, inlineKeyboardMarkup);
+        return buildMessage(chatId, ButtonActionTypeEnum.CHOOSE_MARKUP_TYPE.actionTypeMessage, inlineKeyboardMarkup);
+    }
+
+    public void setReplyForButtonAction(CallbackQuery callbackQuery) {
+        String initMessageText = callbackQuery.getMessage().getText();
+        ButtonActionTypeEnum buttonAction = Objects.requireNonNull(ButtonActionTypeEnum.valueOf(initMessageText));
+        String callbackData = callbackQuery.getData();
+
+        switch (buttonAction) {
+            case CHOOSE_ACTION:
+                setReplyForMenuButton(callbackData);
+            case CHOOSE_MARKUP_TYPE:
+                setReplyForMarkupTypeButton(callbackData);
+            default:
+                // todo
+        }
     }
 
     private InlineKeyboardButton setButtonData(String text) {
@@ -98,7 +117,33 @@ public class InlineKeyboardService {
         }
     }
 
-    private static final String MENU_TEXT = "Выберите действие:";
-    private static final String ALL_ELEMENTS_TEXT = "Список маркировок:";
+    private void setReplyForMenuButton(String callbackData) {
+        MenuButtonEnum replyDataEnum = Objects.requireNonNull(MenuButtonEnum.valueOfMessage(callbackData));
+
+        // todo
+        switch (replyDataEnum) {
+            case SEARCH_BY_MARKUP:
+            case SHOW_MARKUPS:
+            default:
+        }
+    }
+
+    private void setReplyForMarkupTypeButton(String callbackData) {
+        WasteTypeEnum wasteTypeEnum = Objects.requireNonNull(WasteTypeEnum.valueOfWasteType(callbackData));
+
+        // todo
+        switch (wasteTypeEnum) {
+            case PLASTIC:
+            case PAPER:
+            case METAL:
+            case TIMBER:
+            case TEXTILE:
+            case GLASS:
+            case COMPOSITE:
+            case OTHER:
+            default:
+        }
+    }
+
     private static final int MAX_ELEMENTS_IN_ROW_COUNT = 3;
 }
