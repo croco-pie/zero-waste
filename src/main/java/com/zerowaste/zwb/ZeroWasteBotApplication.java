@@ -1,13 +1,20 @@
 package com.zerowaste.zwb;
 
-import org.springframework.boot.SpringApplication;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+
+@Slf4j
 @SpringBootApplication
-public class ZeroWasteBotApplication {
+@EnableAutoConfiguration
+@EnableJpaRepositories
+public class ZeroWasteBotApplication extends SpringBootServletInitializer {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ZeroWasteBotApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(ZeroWasteBotApplication.class).run(args);
+    }
 }

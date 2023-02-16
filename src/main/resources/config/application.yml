@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: zero-waste-bot
+  jackson:
+    serialization.indent_output: true
+    serialization.write_dates_as_timestamps: false
+    serialization.write_date_timestamps_as_nanoseconds: false
+    deserialization.read_date_timestamps_as_nanoseconds: false
+    mapper.accept_case_insensitive_enums: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    database: POSTGRESQL
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.jdbc.lob.non_contextual_creation: true
+#  messages:
+#    basename: i18n/messages
+  liquibase:
+    enabled: true
+    changelog: classpath:liquibase/changelog-master.xml
+  profiles:
+    active: local
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    liquibase: INFO
+
+bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}
