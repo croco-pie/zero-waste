@@ -15,7 +15,7 @@ public enum MenuButtonEnum {
         return message;
     }
 
-    public static MenuButtonEnum valueOfMessage(String value) {
+    public static MenuButtonEnum valueOfMenuButton(String value) {
         for (MenuButtonEnum menuButtonEnum : values()) {
             if (menuButtonEnum.message.equals(value)) {
                 return menuButtonEnum;

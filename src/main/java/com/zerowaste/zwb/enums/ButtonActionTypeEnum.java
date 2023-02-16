@@ -9,4 +9,13 @@ public enum ButtonActionTypeEnum {
     ButtonActionTypeEnum(String actionTypeMessage) {
         this.actionTypeMessage = actionTypeMessage;
     }
+
+    public static ButtonActionTypeEnum valueOfButtonAction(String value) {
+        for (ButtonActionTypeEnum buttonActionTypeEnum : values()) {
+            if (buttonActionTypeEnum.actionTypeMessage.equals(value)) {
+                return buttonActionTypeEnum;
+            }
+        }
+        return null;
+    }
 }

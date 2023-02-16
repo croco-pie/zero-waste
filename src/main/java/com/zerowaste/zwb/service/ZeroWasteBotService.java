@@ -1,7 +1,9 @@
 package com.zerowaste.zwb.service;
 
 import com.zerowaste.zwb.config.BotConfig;
+import com.zerowaste.zwb.enums.ButtonActionTypeEnum;
 import com.zerowaste.zwb.enums.InitMessageEnum;
+import com.zerowaste.zwb.enums.MenuButtonEnum;
 import com.zerowaste.zwb.enums.WasteTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -14,10 +16,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,7 +34,6 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
 
     private final BotConfig botConfig;
     private final MarkupCodeProcessingService markupCodeProcessingService;
-    private final InlineKeyboardService inlineKeyboardService;
 
     @Override
     public String getBotUsername() {
@@ -64,7 +69,7 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
             if (update.hasCallbackQuery()) {
                 setReplyForButtonAction(update.getCallbackQuery());
             } else {
-                replyMessage = ERROR_MESSAGE;
+                replyMessage = GENERAL_ERROR_MESSAGE;
             }
         }
 
@@ -74,12 +79,34 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
     }
 
     private String setReplyWithWasteCodeInfo(Message message) {
-        return markupCodeProcessingService.findByWasteCodeOrMarkup(message);
+        if (message.hasText()) {
+            return markupCodeProcessingService.findByWasteCodeOrMarkup(message.getText().toLowerCase());
+        } else {
+            log.error("Not a valid code: {}", message);
+            return GENERAL_ERROR_MESSAGE;
+        }
     }
 
     @SneakyThrows
     private void setReplyWithButtons(String chatId) {
-        execute(inlineKeyboardService.buildInlineKeyboardMenu(chatId));
+        execute(buildInlineKeyboardMenu(chatId));
+    }
+
+    private SendMessage buildInlineKeyboardMenu(String chatId) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<InlineKeyboardButton> keyboardButtons = new ArrayList<>();
+        List<List<InlineKeyboardButton>> keyboardRow = new ArrayList<>();
+
+        InlineKeyboardButton searchByMarkupButton = setButtonData(MenuButtonEnum.SEARCH_BY_MARKUP.getMessage());
+        InlineKeyboardButton showMarkupsButton = setButtonData(MenuButtonEnum.SHOW_MARKUPS.getMessage());
+
+        keyboardButtons.add(searchByMarkupButton);
+        keyboardButtons.add(showMarkupsButton);
+        keyboardRow.add(keyboardButtons);
+
+        inlineKeyboardMarkup.setKeyboard(keyboardRow);
+
+        return buildMessage(chatId, ButtonActionTypeEnum.CHOOSE_ACTION.actionTypeMessage, inlineKeyboardMarkup);
     }
 
     @SneakyThrows
@@ -87,17 +114,120 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
         List<String> wasteTypeNames = Arrays.stream(WasteTypeEnum.values())
                 .map(WasteTypeEnum::getWasteTypeName)
                 .collect(Collectors.toList());
-        execute(inlineKeyboardService.buildInlineKeyboardWasteCodes(chatId, wasteTypeNames));
+        execute(buildInlineKeyboardWasteCodes(chatId, wasteTypeNames));
     }
 
     @SneakyThrows
     private void setReplyWithShowWasteCodeByTypeButtons(String chatId, WasteTypeEnum type) {
         List<String> codeNames = markupCodeProcessingService.findAllCodeNamesByType(type);
-        execute(inlineKeyboardService.buildInlineKeyboardWasteCodes(chatId, codeNames));
+        execute(buildInlineKeyboardWasteCodes(chatId, codeNames));
+    }
+
+    private SendMessage buildInlineKeyboardWasteCodes(String chatId, List<String> names) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> keyboardRow = buildKeyBoardRows(names);
+
+        inlineKeyboardMarkup.setKeyboard(keyboardRow);
+
+        return buildMessage(chatId, ButtonActionTypeEnum.CHOOSE_MARKUP_TYPE.actionTypeMessage, inlineKeyboardMarkup);
     }
 
     private void setReplyForButtonAction(CallbackQuery callbackQuery) {
-        inlineKeyboardService.setReplyForButtonAction(callbackQuery);
+        String initMessageText = callbackQuery.getMessage().getText();
+        ButtonActionTypeEnum buttonAction = Objects.requireNonNull(ButtonActionTypeEnum.valueOfButtonAction(initMessageText));
+        String callbackData = callbackQuery.getData();
+
+        switch (buttonAction) {
+            case CHOOSE_ACTION:
+                setReplyForMenuButton(callbackData);
+            case CHOOSE_MARKUP_TYPE:
+                setReplyForMarkupTypeButton(callbackData);
+            default:
+                // todo
+        }
+    }
+
+
+    private void setReplyForMenuButton(String callbackData) {
+        MenuButtonEnum replyDataEnum = Objects.requireNonNull(MenuButtonEnum.valueOfMenuButton(callbackData));
+
+        // todo
+        switch (replyDataEnum) {
+            case SEARCH_BY_MARKUP:
+            case SHOW_MARKUPS:
+            default:
+        }
+    }
+
+    private void setReplyForMarkupTypeButton(String callbackData) {
+        WasteTypeEnum wasteTypeEnum = Objects.requireNonNull(WasteTypeEnum.valueOfWasteType(callbackData));
+
+        // todo
+        switch (wasteTypeEnum) {
+            case PLASTIC:
+            case PAPER:
+            case METAL:
+            case TIMBER:
+            case TEXTILE:
+            case GLASS:
+            case COMPOSITE:
+            case OTHER:
+            default:
+        }
+    }
+
+    private InlineKeyboardButton setButtonData(String text) {
+        return InlineKeyboardButton.builder()
+                .text(text)
+                .callbackData(text)
+                .build();
+    }
+
+    private SendMessage buildMessage(String chatId, String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(text);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+
+        return message;
+    }
+
+    private List<List<InlineKeyboardButton>> buildKeyBoardRows(List<String> codeNames) {
+        List<List<InlineKeyboardButton>> keyboardRow = new ArrayList<>();
+
+        addRows(keyboardRow, codeNames.size());
+        addButtonsToRow(keyboardRow, codeNames);
+
+        return keyboardRow;
+    }
+
+    private void addRows(List<List<InlineKeyboardButton>> keyboardRow, int listSize) {
+        int rowCount = getRowCount(listSize);
+
+        for (int i = 0; i < rowCount; i++) {
+            keyboardRow.add(new ArrayList<>(MAX_ELEMENTS_IN_ROW_COUNT));
+        }
+    }
+
+    private int getRowCount(int listSize) {
+        int rowCount = listSize / MAX_ELEMENTS_IN_ROW_COUNT;
+        int extraRowCount = listSize % MAX_ELEMENTS_IN_ROW_COUNT;
+        if (extraRowCount != 0) {
+            rowCount++;
+        }
+
+        return rowCount;
+    }
+
+    private void addButtonsToRow(List<List<InlineKeyboardButton>> keyboardRow, List<String> codeNames) {
+        int rowIndex = 0;
+        for (String codeName : codeNames) {
+            if (keyboardRow.get(rowIndex).size() < MAX_ELEMENTS_IN_ROW_COUNT) {
+                keyboardRow.get(rowIndex).add(setButtonData(codeName));
+            } else {
+                keyboardRow.get(++rowIndex).add(setButtonData(codeName));
+            }
+        }
     }
 
     private void replyWith(String response, SendMessage.SendMessageBuilder builder) {
@@ -109,10 +239,11 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
         }
     }
 
+    private static final int MAX_ELEMENTS_IN_ROW_COUNT = 3;
     private static final String GREETING_MESSAGE = "Привет! \n" +
             "Это учебный бот, который помогает определить маркировку отходов. \n\n" +
             "Для открытия меню поиска нажмите /search. \n\n" +
             "Для просмотра всех маркировок нажмите /show. \n\n" +
             "Для быстрого поиска введите код или название маркировки, например, 7 или ALU.";
-    private static final String ERROR_MESSAGE = "Что-то пошло не так...";
+    private static final String GENERAL_ERROR_MESSAGE = "Что-то пошло не так...";
 }
