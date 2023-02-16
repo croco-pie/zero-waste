@@ -22,7 +22,7 @@ spring:
 #    basename: i18n/messages
   liquibase:
     enabled: true
-    changelog: classpath:liquibase/changelog-master.xml
+    changelog: classpath:liquibase/changelog-master.yml
   profiles:
     active: local
 server:
