@@ -9,7 +9,11 @@ import java.util.UUID;
 
 public interface WasteRepository extends JpaRepository<WasteEntity, UUID> {
 
-    List<WasteEntity> findAllByCodeNumOrCodeName(String codeNum, String codeName);
+    List<WasteEntity> findAllByCodeNumOrCodeName(Integer codeNum, String codeName);
+
+    List<WasteEntity> findAllByCodeNum(Integer codeNum);
 
     List<WasteEntity> findAllByIsShownAndWasteTypeIs(boolean isShown, WasteTypeEnum type);
+
+    List<WasteEntity> findAllByIsShown(boolean isShown);
 }

@@ -9,9 +9,14 @@ import com.zerowaste.zwb.util.EntityConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.zerowaste.zwb.enums.WasteTypeEnum.*;
 
 @Slf4j
 @Service
@@ -24,21 +29,54 @@ public class MarkupCodeProcessingServiceImpl implements MarkupCodeProcessingServ
         List<WasteDTO> found = findAllByWasteCodeOrMarkup(message);
         if (found == null || found.isEmpty()) {
             log.info("Code invalid or not found: {}", message);
-            return INVALID_INPUT_ERROR_MESSAGE;
+            return null;
         } else {
             return processFoundResult(found);
         }
     }
 
-    public List<String> findAllCodeNamesByType(WasteTypeEnum type) {
+    public List<String> findCodeNamesAndNumsAndDescriptionsByType(WasteTypeEnum type) {
         return wasteRepository.findAllByIsShownAndWasteTypeIs(true, type).stream()
-                .map(WasteEntity::getCodeName)
+                .sorted(Comparator.comparing(WasteEntity::getCodeNum))
+                .map(wc -> String.format("%s %s", wc.getCodeNum(), wc.getCodeName()))
+                .collect(Collectors.toList());
+    }
+
+    public boolean checkIfCodeNumExists(Integer codeNum) {
+        List<WasteEntity> maybeFound = wasteRepository.findAllByCodeNum(codeNum);
+        return !CollectionUtils.isEmpty(maybeFound);
+    }
+
+    public WasteDTO addWasteCode(Integer codeNum, String codeName, String description) {
+        WasteEntity newWaste = new WasteEntity();
+        newWaste.setCodeNum(codeNum);
+        newWaste.setCodeName(codeName);
+        newWaste.setCodeDescription(description);
+        newWaste.setShown(false);
+        newWaste.setWasteType(defineWasteType(codeNum));
+        newWaste.setAddedByUsers(true);
+
+        WasteEntity added = wasteRepository.save(newWaste);
+        WasteDTO converted = EntityConverter.convertEntityToDTO(added);
+        log.info("New waste code was successfully added to database: {}", added);
+
+        return converted;
+    }
+
+    public List<WasteTypeEnum> findExistingWasteTypes() {
+        return wasteRepository.findAllByIsShown(true).stream()
+                .map(WasteEntity::getWasteType)
                 .distinct()
                 .collect(Collectors.toList());
     }
 
     private List<WasteDTO> findAllByWasteCodeOrMarkup(String code) {
-        List<WasteEntity> found = wasteRepository.findAllByCodeNumOrCodeName(code, code);
+        Integer codeNum = null;
+        if (code.matches(NUMERIC_REGEX)) {
+            codeNum = Integer.parseInt(code);
+        }
+
+        List<WasteEntity> found = wasteRepository.findAllByCodeNumOrCodeName(codeNum, code);
         return found.stream().map(EntityConverter::convertEntityToDTO).collect(Collectors.toList());
     }
 
@@ -58,5 +96,37 @@ public class MarkupCodeProcessingServiceImpl implements MarkupCodeProcessingServ
         }
     }
 
-    private static final String INVALID_INPUT_ERROR_MESSAGE = "Вы ввели невалидный код, либо мы пока не знаем эту маркировку :(";
+    private WasteTypeEnum defineWasteType(Integer codeNum) {
+        String wasteGroup = null;
+
+        if (belongsToGroup(codeNum, OTHER)) {
+            wasteGroup = OTHER.getWasteTypeName();
+        } else if (belongsToGroup(codeNum, PLASTIC)) {
+            wasteGroup = PLASTIC.getWasteTypeName();
+        } else if (belongsToGroup(codeNum, PAPER)) {
+            wasteGroup = PAPER.getWasteTypeName();
+        } else if (belongsToGroup(codeNum, METAL)) {
+            wasteGroup = METAL.getWasteTypeName();
+        } else if (belongsToGroup(codeNum, TIMBER)) {
+            wasteGroup = TIMBER.getWasteTypeName();
+        } else if (belongsToGroup(codeNum, TEXTILE)) {
+            wasteGroup = TEXTILE.getWasteTypeName();
+        } else if (belongsToGroup(codeNum, GLASS)) {
+            wasteGroup = GLASS.getWasteTypeName();
+        } else if (belongsToGroup(codeNum, COMPOSITE)) {
+            wasteGroup = COMPOSITE.getWasteTypeName();
+        }
+
+        if (Objects.isNull(wasteGroup)) {
+            throw new IllegalArgumentException("Waste group is NULL, code number: " + codeNum);
+        }
+
+        return WasteTypeEnum.valueOfWasteType(wasteGroup);
+    }
+
+    private boolean belongsToGroup(Integer codeNum, WasteTypeEnum type) {
+        return (codeNum >= type.wasteBeginCode) && (codeNum <= type.wasteEndCode);
+    }
+
+    private static final String NUMERIC_REGEX = "\\d{1,2}";
 }

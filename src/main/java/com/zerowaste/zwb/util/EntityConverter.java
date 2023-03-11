@@ -11,6 +11,7 @@ public class EntityConverter {
                 .codeNum(wasteEntity.getCodeNum())
                 .codeName(wasteEntity.getCodeName())
                 .codeDescription(wasteEntity.getCodeDescription())
+                .type(wasteEntity.getWasteType())
                 .build();
     }
 }
