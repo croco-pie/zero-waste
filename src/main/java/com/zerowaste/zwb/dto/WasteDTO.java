@@ -1,5 +1,6 @@
 package com.zerowaste.zwb.dto;
 
+import com.zerowaste.zwb.enums.WasteTypeEnum;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,9 +11,8 @@ import java.util.UUID;
 public class WasteDTO {
 
     private UUID id;
-    private String codeNum;
+    private Integer codeNum;
     private String codeName;
-    private UUID codeId;
     private String codeDescription;
-
+    private WasteTypeEnum type;
 }

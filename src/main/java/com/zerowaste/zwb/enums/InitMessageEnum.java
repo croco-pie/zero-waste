@@ -3,7 +3,7 @@ package com.zerowaste.zwb.enums;
 public enum InitMessageEnum {
 
     START("/start"),
-    SEARCH("/search"),
+    ADD("/add"),
     SHOW("/show");
 
     public final String message;

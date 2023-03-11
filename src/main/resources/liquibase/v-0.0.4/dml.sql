@@ -1,6 +1,7 @@
 --liquibase formatted sql
---changeset crocopie:add_enum_values_to_waste
 
+--changeset crocopie:add_waste_types
+UPDATE zero_waste.waste SET waste_type = 'OTHER' WHERE code_num = '0';
 UPDATE zero_waste.waste SET waste_type = 'PLASTIC' WHERE code_num BETWEEN '1' AND '19';
 UPDATE zero_waste.waste SET waste_type = 'PAPER' WHERE code_num BETWEEN '20' AND '39';
 UPDATE zero_waste.waste SET waste_type = 'METAL' WHERE code_num BETWEEN '40' AND '49';
