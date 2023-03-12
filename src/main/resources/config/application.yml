@@ -1,3 +1,6 @@
+database:
+  default_schema: zero_waste
+
 spring:
   application:
     name: zero-waste-bot
@@ -23,6 +26,7 @@ spring:
   liquibase:
     enabled: true
     changelog: classpath:liquibase/changelog-master.yml
+    default-schema: ${database.default_schema}
   profiles:
     active: local
 server:

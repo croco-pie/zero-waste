@@ -14,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Table(name = "waste", schema = "zero_waste")
+@Table(name = "waste")
 @TypeDef(name = "pgsql_enum", typeClass = PostgreSQLEnumType.class)
 public class WasteEntity {
 
