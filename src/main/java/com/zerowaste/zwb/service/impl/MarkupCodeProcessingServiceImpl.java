@@ -72,12 +72,16 @@ public class MarkupCodeProcessingServiceImpl implements MarkupCodeProcessingServ
 
     private List<WasteDTO> findAllByWasteCodeOrMarkup(String code) {
         Integer codeNum = null;
-        if (code.matches(NUMERIC_REGEX)) {
+        if (code != null && code.matches(NUMERIC_REGEX)) {
             codeNum = Integer.parseInt(code);
         }
 
         List<WasteEntity> found = wasteRepository.findAllByCodeNumOrCodeName(codeNum, code);
-        return found.stream().map(EntityConverter::convertEntityToDTO).collect(Collectors.toList());
+        return found.stream()
+                .filter(WasteEntity::isShown)
+                .map(EntityConverter::convertEntityToDTO)
+                .sorted(Comparator.comparing(WasteDTO::getCodeNum))
+                .collect(Collectors.toList());
     }
 
     private String processFoundResult(List<WasteDTO> found) {
@@ -88,11 +92,15 @@ public class MarkupCodeProcessingServiceImpl implements MarkupCodeProcessingServ
         } else {
             StringBuilder stringBuilder = new StringBuilder();
             found.forEach(waste -> {
+                stringBuilder.append(waste.getCodeNum());
+                stringBuilder.append(" - ");
+                stringBuilder.append(waste.getCodeName());
+                stringBuilder.append(" - ");
                 stringBuilder.append(waste.getCodeDescription());
                 stringBuilder.append("\n\n");
             });
 
-            return stringBuilder.toString();
+            return stringBuilder.toString().trim();
         }
     }
 

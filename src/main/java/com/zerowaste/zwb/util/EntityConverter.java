@@ -7,7 +7,6 @@ public class EntityConverter {
 
     public static WasteDTO convertEntityToDTO(WasteEntity wasteEntity) {
         return WasteDTO.builder()
-                .id(wasteEntity.getId())
                 .codeNum(wasteEntity.getCodeNum())
                 .codeName(wasteEntity.getCodeName())
                 .codeDescription(wasteEntity.getCodeDescription())
