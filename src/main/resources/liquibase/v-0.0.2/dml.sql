@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset crocopie:add_values_to_waste
 
-INSERT INTO zero_waste.waste (id,code_num,code_name,code_description,is_shown) VALUES
+INSERT INTO waste (id,code_num,code_name,code_description,is_shown) VALUES
 	 ('60430885-cf94-460e-8902-9604c561f2aa','72','GL','Стекло',true),
 	 ('798b6dd5-9bc7-479d-84db-7369fcdf71a1','73','GL','Стекло',true),
 	 ('0e88af0d-e822-4ed0-b8f9-0cae23deed3a','74','GL','Стекло',true),

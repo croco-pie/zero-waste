@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=zero_waste
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=${database.default_schema}
     username: postgres
     password: fusrodah
     driver-class-name: org.postgresql.Driver

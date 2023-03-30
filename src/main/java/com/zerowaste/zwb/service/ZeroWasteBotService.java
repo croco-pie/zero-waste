@@ -146,7 +146,7 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
     }
 
     private String setReplyWithWasteCodeInfo(String test) {
-        String maybeFound = markupCodeProcessingService.findByWasteCodeOrMarkup(test.toLowerCase());
+        String maybeFound = markupCodeProcessingService.findByWasteCodeOrMarkup(test.toUpperCase());
         return Objects.requireNonNullElse(maybeFound, INVALID_INPUT_ERROR_MESSAGE);
     }
 
@@ -177,10 +177,16 @@ public class ZeroWasteBotService extends TelegramLongPollingBot {
         String callbackData = callbackQuery.getData();
 
         switch (buttonAction) {
-            case CHOOSE_MARKUP_TYPE -> setReplyForMarkupTypeButton(chatId, callbackData);
-            case CHOOSE_MARKUP_CODE -> setReplyForMarkupCodeButton(chatId, callbackData, builder);
-            default -> {
+            case CHOOSE_MARKUP_TYPE: {
+                setReplyForMarkupTypeButton(chatId, callbackData);
+                break;
             }
+            case CHOOSE_MARKUP_CODE: {
+                setReplyForMarkupCodeButton(chatId, callbackData, builder);
+                break;
+            }
+            default:
+                break;
         }
     }
 

@@ -1,5 +1,5 @@
 database:
-  default_schema: zero_waste
+  default_schema: public
 
 spring:
   application:
@@ -21,14 +21,21 @@ spring:
     properties:
       hibernate.id.new_generator_mappings: true
       hibernate.jdbc.lob.non_contextual_creation: true
-#  messages:
-#    basename: i18n/messages
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=${default_schema}
+    username: mock1
+    password: mock2
+    driver-class-name: org.postgresql.Driver
+  #  messages:
+  #    basename: i18n/messages
   liquibase:
     enabled: true
     changelog: classpath:liquibase/changelog-master.yml
     default-schema: ${database.default_schema}
-  profiles:
-    active: local
+  flyway:
+    enabled: false
+#  profiles:
+#    active: unit
 server:
   port: 8080
 management:
@@ -45,5 +52,5 @@ logging:
     liquibase: INFO
 
 bot:
-  name: ${BOT_NAME}
-  token: ${BOT_TOKEN}
+  name: mock
+  token: mock
